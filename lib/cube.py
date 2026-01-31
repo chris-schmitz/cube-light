@@ -85,6 +85,8 @@ class CubeFace:
 
 
 class Cube:
+    # todo consider refactor: why accept a list of faces? we always only have 6, so just accept them
+    #   as named parameters
     def __init__(self, faces: List[CubeFace]):
         self.faces = {}
         for face in faces:
@@ -129,18 +131,6 @@ class Cube:
             return True
         except IndexError:
             return False
-
-        return
-        # todo: the cube has to know a lot about the cells here. is there a way we can move some of the logic up into the CubeFace?
-        top_cells = [face.get_cells() for _, face in self.faces.items()][0]
-        # todo: hmmmm, maybe it's worth writing out a for loop, at least for this first level since we can't do an actual functional pipeline?
-        # ? do we really need this remapping of the cell to a dict? can't we just sort the cells?
-        index_and_color = [{'index': cell.get_led_index(), 'color': cell.get_current_color()} for _, cell in
-                           top_cells.items()]
-        sorted_list = sorted(index_and_color, key=lambda c: c['index'])
-        highest_led_index = sorted_list[-1]['index']
-        colors_in_order = [sorted_list[i] or (0, 0, 0) for i in range(highest_led_index)]
-        return [cell['color'] for cell in sorted_list]
 
 # {0, 1, 2, 3, 6, 8, 11, 13, 16, 18}
 # right = cube_side("right", {15, 17, 19, 22, 23, 24, 40, 41, 43})

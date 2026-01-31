@@ -11,7 +11,7 @@ import json
 
 
 class TestCell:
-    def test_can_get_cell_state(self):
+    def test_can_get_led_assignment_from_cell(self):
         cell = Cell(FacePosition.BOTTOM_CENTER, 3)
         cell.set_color((0, 0, 255))
 
