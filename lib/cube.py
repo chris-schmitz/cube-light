@@ -85,12 +85,22 @@ class CubeFace:
 
 
 class Cube:
-    # todo consider refactor: why accept a list of faces? we always only have 6, so just accept them
-    #   as named parameters
-    def __init__(self, faces: List[CubeFace]):
-        self.faces = {}
-        for face in faces:
-            self.faces[face.get_name()] = face
+    def __init__(self,
+                 top_face: CubeFace,
+                 bottom_face: CubeFace,
+                 left_face: CubeFace,
+                 right_face: CubeFace,
+                 front_face: CubeFace,
+                 back_face: CubeFace,
+                 ):
+        self.faces = {
+            Face.TOP: top_face,
+            Face.BOTTOM: bottom_face,
+            Face.LEFT: left_face,
+            Face.RIGHT: right_face,
+            Face.FRONT: front_face,
+            Face.BACK: back_face,
+        }
 
     def _get_face(self, face_name: Face) -> CubeFace:
         return self.faces[face_name]

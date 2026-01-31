@@ -1,44 +1,8 @@
 import unittest
 from typing import List
-
 import pytest
 
 from lib.cube import Cube, CubeFace, Face, FacePosition, Cell, LedAssignmentData
-import json
-
-
-# todo: break all of these test suites out into their own files
-
-
-class TestCell:
-    def test_can_get_led_assignment_from_cell(self):
-        cell = Cell(FacePosition.BOTTOM_CENTER, 3)
-        cell.set_color((0, 0, 255))
-
-        actual = cell.get_state()
-
-        assert find_specific_assignment_data(3, [actual]).color == (0, 0, 255)
-
-
-class TestCubeFace:
-    def test_can_get_led_assignment_state_for_entire_face(self):
-        face = CubeFace(
-            Face.LEFT,
-            [
-                Cell(FacePosition.TOP_LEFT, 5),
-                Cell(FacePosition.TOP_CENTER, 8),
-                Cell(FacePosition.TOP_RIGHT, 2),
-            ]
-        )
-        face.set_cell_color(FacePosition.TOP_LEFT, (255, 0, 0))
-        face.set_cell_color(FacePosition.TOP_RIGHT, (0, 255, 0))
-        face.set_cell_color(FacePosition.TOP_CENTER, (0, 0, 255))
-
-        actual = face.get_state()
-
-        assert find_specific_assignment_data(5, actual).color == (255, 0, 0)
-        assert find_specific_assignment_data(8, actual).color == (0, 0, 255)
-        assert find_specific_assignment_data(2, actual).color == (0, 255, 0)
 
 
 class TestCube:
@@ -48,7 +12,14 @@ class TestCube:
             Cell(FacePosition.TOP_CENTER, 1),
             Cell(FacePosition.TOP_RIGHT, 2),
         ]
-        cube = Cube([CubeFace(Face.TOP, cells)])
+        cube = Cube(
+            top_face=CubeFace(Face.TOP, cells),
+            bottom_face=CubeFace(Face.BOTTOM, []),
+            left_face=CubeFace(Face.LEFT, []),
+            right_face=CubeFace(Face.RIGHT, []),
+            front_face=CubeFace(Face.FRONT, []),
+            back_face=CubeFace(Face.BACK, []),
+        )
 
         cube.set_face_color(Face.TOP, (255, 255, 255))
 
@@ -60,7 +31,14 @@ class TestCube:
             Cell(FacePosition.TOP_LEFT, 0),
             Cell(FacePosition.TOP_CENTER, 1),
         ]
-        cube = Cube([CubeFace(Face.TOP, top_cells)])
+        cube = Cube(
+            top_face=CubeFace(Face.TOP, top_cells),
+            bottom_face=CubeFace(Face.BOTTOM, []),
+            left_face=CubeFace(Face.LEFT, []),
+            right_face=CubeFace(Face.RIGHT, []),
+            front_face=CubeFace(Face.FRONT, []),
+            back_face=CubeFace(Face.BACK, []),
+        )
 
         actual = cube.get_state()
 
@@ -72,9 +50,14 @@ class TestCube:
             Cell(FacePosition.TOP_LEFT, 0),
             Cell(FacePosition.TOP_CENTER, 1),
         ]
-        cube = Cube([
-            CubeFace(Face.TOP, top_cells)
-        ])
+        cube = Cube(
+            top_face=CubeFace(Face.TOP, top_cells),
+            bottom_face=CubeFace(Face.BOTTOM, []),
+            left_face=CubeFace(Face.LEFT, []),
+            right_face=CubeFace(Face.RIGHT, []),
+            front_face=CubeFace(Face.FRONT, []),
+            back_face=CubeFace(Face.BACK, []),
+        )
 
         cube.set_cell_color(Face.TOP, FacePosition.TOP_LEFT, (255, 0, 0))
         cube.set_cell_color(Face.TOP, FacePosition.TOP_CENTER, (0, 0, 255))
@@ -89,9 +72,14 @@ class TestCube:
             Cell(FacePosition.TOP_LEFT, 0),
             Cell(FacePosition.TOP_CENTER, 1),
         ]
-        cube = Cube([
-            CubeFace(Face.TOP, top_cells),
-        ])
+        cube = Cube(
+            top_face=CubeFace(Face.TOP, top_cells),
+            bottom_face=CubeFace(Face.BOTTOM, []),
+            left_face=CubeFace(Face.LEFT, []),
+            right_face=CubeFace(Face.RIGHT, []),
+            front_face=CubeFace(Face.FRONT, []),
+            back_face=CubeFace(Face.BACK, []),
+        )
         # * same setup as the last test, but we're making all fo the colors consistent so the
         # * changed one stands out better visually in the result
         cube.set_cell_color(Face.TOP, FacePosition.TOP_LEFT, (255, 0, 0))
@@ -118,7 +106,14 @@ class TestCube:
             Cell(FacePosition.TOP_RIGHT, 5),
             Cell(FacePosition.TOP_LEFT, 0),
         ]
-        cube = Cube([CubeFace(Face.TOP, top_cells)])
+        cube = Cube(
+            top_face=CubeFace(Face.TOP, top_cells),
+            bottom_face=CubeFace(Face.BOTTOM, []),
+            left_face=CubeFace(Face.LEFT, []),
+            right_face=CubeFace(Face.RIGHT, []),
+            front_face=CubeFace(Face.FRONT, []),
+            back_face=CubeFace(Face.BACK, []),
+        )
         cube.set_cell_color(Face.TOP, FacePosition.TOP_LEFT, (255, 255, 255))
         cube.set_cell_color(Face.TOP, FacePosition.TOP_RIGHT, (255, 255, 255))
 
@@ -152,26 +147,16 @@ class TestCube:
             Cell(FacePosition.MIDDLE_LEFT, 4),
             Cell(FacePosition.BOTTOM_LEFT, 5),
         ]
-        cube = Cube([
-            CubeFace(Face.TOP, top_cells),
-            CubeFace(Face.LEFT, left_cells)
-        ])
+        cube = Cube(
+            top_face=CubeFace(Face.TOP, top_cells),
+            bottom_face=CubeFace(Face.BOTTOM, []),
+            left_face=CubeFace(Face.LEFT, left_cells),
+            right_face=CubeFace(Face.RIGHT, []),
+            front_face=CubeFace(Face.FRONT, []),
+            back_face=CubeFace(Face.BACK, []),
+        )
         cube.set_face_color(Face.TOP, (255, 255, 255))
         cube.set_face_color(Face.LEFT, (255, 0, 0))
 
         # ^ https://jperm.net/3x3/moves
         cube.rotate()
-
-
-# * === helpers ===
-# ? circuit python doesn't allow for @dataclass (not practically) and really I only need serialization for state
-# ? comparison in testing, so I don't want to put a bunch of serialization methods into the classes just for test
-# ? assertions. That combined with the fact that this is a super tiny codebase and this file will likely be the only
-# ? set of test suites I'm fine with just making hyper specific serialization helper functions for each of the classes.
-# ? That way we're not comparing class instant ids and when there's a test failure we can actually read the dif.
-def serialize_cell(cell: Cell):
-    return f'position:{cell.get_face_position()}, led_index: {cell.get_led_index()}, color: {cell.get_current_color()}'
-
-
-def find_specific_assignment_data(led_index: int, assignments: List[LedAssignmentData]):
-    return list(filter(lambda assignment: assignment.led_index == led_index, assignments))[0]
