@@ -1,15 +1,6 @@
 from typing import List, Tuple, Dict
 
 
-class LedAssignmentData:
-    led_index: int
-    color: Tuple[int, int, int]
-
-    def __init__(self, led_index: int, color: Tuple[int, int, int]):
-        self.led_index = led_index
-        self.color = color
-
-
 class FacePosition:
     TOP_LEFT = 'top_left'
     TOP_CENTER = 'top_center'
@@ -31,12 +22,62 @@ class Face:
     BOTTOM = 'bottom'
 
 
+# * During any rotation there are two concepts that we have to account for
+# - the face we're rotating -> all cell reassignments happen within the face itself
+# - the bordering faces -> all cell reassignments will go from one face to the next in a specific order
+class RotationData:
+    def __init__(self, face: Face, border_order: List[Face]):
+        self.face = face
+        self.border_order = border_order
+
+
+class Rotations:
+    R = 'r'
+    R_PRIME = 'r\''
+
+    @staticmethod
+    def get_rotation_data(symbol: str):
+        if symbol == Rotations.R:
+            return RotationData(
+                Face.RIGHT,
+                [Face.FRONT, Face.TOP, Face.BACK, Face.BOTTOM]
+            )
+        elif symbol == Rotations.F:
+            return RotationData(
+                Face.FRONT,
+                [Face.TOP, Face.RIGHT, Face.BOTTOM, Face.LEFT]
+            )
+        else:
+            raise UnknownRotationError(symbol)
+
+
+class LedAssignmentData:
+    def __init__(self, led_index: int, color: Tuple[int, int, int], face_position: str):
+        self.led_index = led_index
+        self.color = color
+        self.face_position = face_position
+
+
+class UnknownRotationError(Exception):
+    """
+    Raised when trying to get the face to rotate via a string symbol
+    since we can't do real enum-y stuff
+    """
+    pass
+
+    def __init__(self, requested_symbol):
+        self.message = f'The requested symbol: {requested_symbol} is not a valid rotation symbol'
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f'{self.message}'
+
+
 class Cell:
     def __init__(self, face_position: str, led_index: int):
         self.face_position = face_position
         self.index = led_index
         self.current_color = (0, 0, 0)
-        # self.current_color = color.BLACK
 
     def set_color(self, new_color):
         self.current_color = new_color
@@ -46,14 +87,17 @@ class Cell:
     def get_led_index(self):
         return self.index
 
-    def get_current_color(self):
+    def get_color(self):
         return self.current_color
 
     def get_face_position(self):
         return self.face_position
 
     def get_state(self):
-        return LedAssignmentData(self.get_led_index(), self.get_current_color())
+        return LedAssignmentData(self.get_led_index(), self.get_color(), self.get_face_position())
+
+    def get_cell(self):
+        return self
 
 
 class CubeFace:
@@ -83,6 +127,44 @@ class CubeFace:
         cells = [cell for _, cell in self.cells_face_position_map.items()]
         return [cell.get_state() for cell in cells]
 
+    # ^ remember to add prime ccw
+    def rotate(self, counter_clockwise=False):
+        if counter_clockwise:
+            tl = self.get_cell_color(FacePosition.TOP_CENTER)
+            tc = self.get_cell_color(FacePosition.TOP_RIGHT)
+            tr = self.get_cell_color(FacePosition.MIDDLE_RIGHT)
+            mr = self.get_cell_color(FacePosition.BOTTOM_RIGHT)
+            br = self.get_cell_color(FacePosition.BOTTOM_CENTER)
+            bc = self.get_cell_color(FacePosition.BOTTOM_LEFT)
+            bl = self.get_cell_color(FacePosition.MIDDLE_LEFT)
+            ml = self.get_cell_color(FacePosition.TOP_LEFT)
+        else:
+            tl = self.get_cell_color(FacePosition.MIDDLE_LEFT)
+            tc = self.get_cell_color(FacePosition.TOP_LEFT)
+            tr = self.get_cell_color(FacePosition.TOP_CENTER)
+            mr = self.get_cell_color(FacePosition.TOP_RIGHT)
+            br = self.get_cell_color(FacePosition.MIDDLE_RIGHT)
+            bc = self.get_cell_color(FacePosition.BOTTOM_RIGHT)
+            bl = self.get_cell_color(FacePosition.BOTTOM_CENTER)
+            ml = self.get_cell_color(FacePosition.BOTTOM_LEFT)
+        # ^ Finish getting all colors before updating state
+        self.set_cell_color(FacePosition.TOP_LEFT, tl)
+        self.set_cell_color(FacePosition.TOP_CENTER, tc)
+        self.set_cell_color(FacePosition.TOP_RIGHT, tr)
+        self.set_cell_color(FacePosition.MIDDLE_RIGHT, mr)
+        self.set_cell_color(FacePosition.BOTTOM_RIGHT, br)
+        self.set_cell_color(FacePosition.BOTTOM_CENTER, bc)
+        self.set_cell_color(FacePosition.BOTTOM_LEFT, bl)
+        self.set_cell_color(FacePosition.MIDDLE_LEFT, ml)
+
+    def get_cell_color(self, face_position: FacePosition):
+        return self.cells_face_position_map[face_position].get_color()
+
+    def set_right_column(self, color_list: List[Tuple[int, int, int]]):
+        self.cells_face_position_map[FacePosition.TOP_RIGHT].set_color(color_list[0])
+        self.cells_face_position_map[FacePosition.MIDDLE_RIGHT].set_color(color_list[1])
+        self.cells_face_position_map[FacePosition.BOTTOM_RIGHT].set_color(color_list[2])
+
 
 class Cube:
     def __init__(self,
@@ -105,9 +187,26 @@ class Cube:
     def _get_face(self, face_name: Face) -> CubeFace:
         return self.faces[face_name]
 
-    def rotate(self, face_to_rotate):
-        print(face_to_rotate)
-        face = self.faces
+    def rotate(self, rotation_symbol: str):
+        # ^ from here we'd need to:
+        # ^ determine what face is rotating from the rotation notation
+        # ^ create a temp state to hold the new cell data
+        # ^ set the temp state with the movement of each cell involved in rotation
+        # ^ write the temp state to the existing cell states
+        # ? would it be better to mutate the existing cells or just new up a bunch of new cells and replace them?
+        rotation_data = Rotations.get_rotation_data(rotation_symbol)
+
+        # ^ rotate_face will specifically rotate all of the cells in the face for a tick of 3
+        updated_face_cells: Dict[Face, List[Cell]] = self._get_face(rotation_data.face).rotate_face(rotation_data.face)
+
+        # # ^ rotate_border will reassign cells from one border to the next in the order for a tick of 3
+        # updated_border_cells: List[Dict[Face, List[Cell]]] = self.rotate_border(rotation_data.border_order)
+        #
+        # self.set_face_state(rotation_data.face, updated_face_cells)
+        # for (update in updated_border_cells):
+        #     self.set_face_state(update, )
+        # self.set_face_state(rotation_data.face, updated_face_cells)
+        # new_state = self.get_face_assignments()
 
     def set_face_color(self, face: Face, color: Tuple[int, int, int]):
         face = self._get_face(face)
@@ -142,8 +241,5 @@ class Cube:
         except IndexError:
             return False
 
-# {0, 1, 2, 3, 6, 8, 11, 13, 16, 18}
-# right = cube_side("right", {15, 17, 19, 22, 23, 24, 40, 41, 43})
-# front = cube_side("top", {2, 4, 20, 25, 26, 27, 35, 36, 38})
-# back = cube_side("back", {10, 12, 14, 21, 31, 32, 45, 46, 49})
-# bottom = cube_side("bottom", {34, 37, 39, 42, 44, 47, 50, 51, 53})
+    def get_face_assignments(self, face: Face) -> List[LedAssignmentData]:
+        return self.faces[face].get_state()
