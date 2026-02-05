@@ -78,7 +78,7 @@ right = CubeFace(Face.RIGHT, cells=[
     Cell(FacePosition.BOTTOM_RIGHT, 43),
 ])
 
-cube = Cube([left, top, bottom, front, back, right])
+cube = Cube(left_face=left, top_face=top, bottom_face=bottom, front_face=front, back_face=back, right_face=right)
 
 current_state = cube.get_state()
 
@@ -99,7 +99,10 @@ white = (200, 200, 200)
 face_color_choices = [yellow, blue, red, orange, green, white]
 n = len(face_color_choices)
 i = 0
-while True:
+
+
+def get_face_colors():
+    global i
     # Use modulo (%) to wrap the index back to 0 when it exceeds the list length
     top_color = face_color_choices[i % n]
     left_color = face_color_choices[(i + 1) % n]
@@ -116,6 +119,11 @@ while True:
     cube.set_face_color(Face.FRONT, color=front_color)
     cube.set_face_color(Face.BACK, color=back_color)
     cube.set_face_color(Face.RIGHT, color=right_color)
+
+
+get_face_colors()
+while True:
+    cube.rotate(Face.FRONT)
     state = cube.get_state()
 
     if current_state != state:

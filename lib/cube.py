@@ -34,6 +34,17 @@ class RotationData:
 class Rotations:
     R = 'r'
     R_PRIME = 'r\''
+    L = 'l'
+    L_PRIME = 'l\''
+    F = 'f'
+    F_PRIME = 'f\''
+    B = 'b'
+    B_PRIME = 'b\''
+    # todo: switch out all references to "TOP" to "UP"
+    U = 'u'
+    U_PRIME = 'u\''
+    D = 'd'
+    D_PRIME = 'd\''
 
     @staticmethod
     def get_rotation_data(symbol: str):
@@ -120,7 +131,7 @@ class CubeFace:
         print(self.cells_face_position_map)
         self.cells_face_position_map[position].set_color(color)
 
-    def get_cells(self):
+    def get_cells(self) -> Dict[FacePosition, Cell]:
         return self.cells_face_position_map
 
     def get_state(self) -> List[LedAssignmentData]:
@@ -160,6 +171,13 @@ class CubeFace:
     def get_cell_color(self, face_position: FacePosition):
         return self.cells_face_position_map[face_position].get_color()
 
+    def get_right_column(self) -> List[LedAssignmentData]:
+        return [
+            self.cells_face_position_map[FacePosition.TOP_RIGHT].get_state(),
+            self.cells_face_position_map[FacePosition.MIDDLE_RIGHT].get_state(),
+            self.cells_face_position_map[FacePosition.BOTTOM_RIGHT].get_state()
+        ]
+
     def set_right_column(self, color_list: List[Tuple[int, int, int]]):
         self.cells_face_position_map[FacePosition.TOP_RIGHT].set_color(color_list[0])
         self.cells_face_position_map[FacePosition.MIDDLE_RIGHT].set_color(color_list[1])
@@ -196,8 +214,10 @@ class Cube:
         # ? would it be better to mutate the existing cells or just new up a bunch of new cells and replace them?
         rotation_data = Rotations.get_rotation_data(rotation_symbol)
 
+        self._rotate_face(rotation_data.face)
+        self._rotate_face_edges(rotation_data.border_order)
         # ^ rotate_face will specifically rotate all of the cells in the face for a tick of 3
-        updated_face_cells: Dict[Face, List[Cell]] = self._get_face(rotation_data.face).rotate_face(rotation_data.face)
+        # updated_face_cells: Dict[Face, List[Cell]] = self._get_face(rotation_data.face).rotate_face(rotation_data.face)
 
         # # ^ rotate_border will reassign cells from one border to the next in the order for a tick of 3
         # updated_border_cells: List[Dict[Face, List[Cell]]] = self.rotate_border(rotation_data.border_order)
@@ -207,6 +227,34 @@ class Cube:
         #     self.set_face_state(update, )
         # self.set_face_state(rotation_data.face, updated_face_cells)
         # new_state = self.get_face_assignments()
+
+    def _rotate_face(self, face: Face):
+        # todo get face from self, call it's rotate method
+        pass
+
+    def _rotate_face_edges(self, border_order: List[Face]):
+        # ^ so here we should be:
+        # - loop through each face
+        # - store the right column state of the given face
+        # - get next face -> set it's right column to the stored state
+        # - do that in a loop till the end
+        # - after the loop, set the remaining grabbed state to the first face's right column
+        # ^ sounds like a dowhile loop
+
+        # todo: if this works collapse back into the loop
+        def get_color_from_assignment_list(led_assignments: List[LedAssignmentData]):
+            return [assignment.color for assignment in led_assignments]
+
+        # todo: cleanup later, basically we have to grab all of the colors before assigning them or we just pull
+        #   one color along all of the sides. we can pack it into a list comprehension and then a for loop
+        border_one_color = get_color_from_assignment_list(self._get_face(border_order[0]).get_right_column())
+        border_two_color = get_color_from_assignment_list(self._get_face(border_order[1]).get_right_column())
+        border_three_color = get_color_from_assignment_list(self._get_face(border_order[2]).get_right_column())
+        border_four_color = get_color_from_assignment_list(self._get_face(border_order[3]).get_right_column())
+        self._get_face(border_order[0]).set_right_column(border_four_color)
+        self._get_face(border_order[1]).set_right_column(border_one_color)
+        self._get_face(border_order[2]).set_right_column(border_two_color)
+        self._get_face(border_order[3]).set_right_column(border_three_color)
 
     def set_face_color(self, face: Face, color: Tuple[int, int, int]):
         face = self._get_face(face)

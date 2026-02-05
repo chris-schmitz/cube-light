@@ -94,6 +94,23 @@ class TestCubeFace:
         # * The center NEVER gets reassigned during a rotation
         assert find_specific_assignment_data_by_face_position(FacePosition.MIDDLE_CENTER, actual).color == WHITE
 
+    def test_can_get_right_column(self, face):
+        face.set_cell_color(FacePosition.TOP_LEFT, RED)
+        face.set_cell_color(FacePosition.TOP_CENTER, GREEN)
+        face.set_cell_color(FacePosition.TOP_RIGHT, BLUE)
+        face.set_cell_color(FacePosition.MIDDLE_RIGHT, RED),
+        face.set_cell_color(FacePosition.BOTTOM_RIGHT, GREEN)
+        face.set_cell_color(FacePosition.BOTTOM_CENTER, BLUE),
+        face.set_cell_color(FacePosition.BOTTOM_LEFT, RED),
+        face.set_cell_color(FacePosition.MIDDLE_LEFT, GREEN),
+        face.set_cell_color(FacePosition.MIDDLE_CENTER, WHITE),
+
+        actual = face.get_right_column()
+
+        assert find_specific_assignment_data_by_face_position(FacePosition.TOP_RIGHT, actual).color == BLUE
+        assert find_specific_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, actual).color == RED
+        assert find_specific_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, actual).color == GREEN
+
     def test_can_set_right_column(self, face):
         face.set_cell_color(FacePosition.TOP_LEFT, RED)
         face.set_cell_color(FacePosition.TOP_CENTER, GREEN)
