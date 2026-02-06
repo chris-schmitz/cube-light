@@ -18,7 +18,7 @@ def find_specific_assignment_data(led_index: int, assignments: List[LedAssignmen
     return list(filter(lambda assignment: assignment.led_index == led_index, assignments))[0]
 
 
-def find_specific_assignment_data_by_face_position(face_position: str, assignments: List[LedAssignmentData]):
+def find_assignment_data_by_face_position(face_position: str, assignments: List[LedAssignmentData]):
     return list(filter(lambda assignment: assignment.face_position == face_position, assignments))[0]
 
 
