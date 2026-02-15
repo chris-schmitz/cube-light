@@ -26,9 +26,10 @@ class Face:
 # - the face we're rotating -> all cell reassignments happen within the face itself
 # - the bordering faces -> all cell reassignments will go from one face to the next in a specific order
 class RotationData:
-    def __init__(self, face: Face, border_order: List[Face]):
+    def __init__(self, face: Face, border_order: List[Face], face_position_move_order: List[FacePosition]):
         self.face = face
         self.border_order = border_order
+        self.face_position_move_order = face_position_move_order
 
 
 class Rotations:
@@ -46,17 +47,28 @@ class Rotations:
     D = 'd'
     D_PRIME = 'd\''
 
+    # todo consider: leave it as a list that we access via index
+    #    or make the border_order and face_position_move_order classes so we can use getting properties like
+    #    get_first(), get_second(), etc?
     @staticmethod
     def get_rotation_data(symbol: str):
         if symbol == Rotations.R:
             return RotationData(
                 Face.RIGHT,
-                [Face.FRONT, Face.UP, Face.BACK, Face.DOWN]
+                [Face.FRONT, Face.UP, Face.BACK, Face.DOWN],
+                [FacePosition.BOTTOM_RIGHT, FacePosition.MIDDLE_RIGHT, FacePosition.TOP_RIGHT]
             )
-        elif symbol == Rotations.F:
+        # elif symbol == Rotations.F:
+        #     return RotationData(
+        #         Face.FRONT,
+        #         [Face.UP, Face.RIGHT, Face.DOWN, Face.LEFT],
+        #         []
+        #     )
+        elif symbol == Rotations.U:
             return RotationData(
-                Face.FRONT,
-                [Face.UP, Face.RIGHT, Face.DOWN, Face.LEFT]
+                Face.UP,
+                [Face.FRONT, Face.LEFT, Face.BACK, Face.RIGHT],
+                [FacePosition.TOP_RIGHT, FacePosition.TOP_CENTER, FacePosition.TOP_LEFT]
             )
         else:
             raise UnknownRotationError(symbol)
@@ -222,43 +234,68 @@ class Cube:
 
             rotation_data = Rotations.get_rotation_data(self._current_rotation_symbol)
 
-            self._rotate_face(rotation_data.face)
-            self._rotate_face_edges(rotation_data.border_order)
+            self._rotate_face(rotation_data)
+            self._rotate_face_border(rotation_data)
         else:
             self._active_rotation_count = 0
             self._is_rotating = False
 
-    def _rotate_face(self, face: Face):
+    def _rotate_face(self, rotation_data: RotationData):
         # todo get face from self, call it's rotate method
-        pass
+        face = self._get_face(rotation_data.face)
+        tl = face.get_cell_color(FacePosition.TOP_LEFT)
+        tc = face.get_cell_color(FacePosition.TOP_CENTER)
+        tr = face.get_cell_color(FacePosition.TOP_RIGHT)
+        mr = face.get_cell_color(FacePosition.MIDDLE_RIGHT)
+        br = face.get_cell_color(FacePosition.BOTTOM_RIGHT)
+        bc = face.get_cell_color(FacePosition.BOTTOM_CENTER)
+        bl = face.get_cell_color(FacePosition.BOTTOM_LEFT)
+        ml = face.get_cell_color(FacePosition.MIDDLE_LEFT)
 
-    def _rotate_face_edges(self, border_order: List[Face]):
-        # todo: we can prob shove this into a list and then loop over it to set the cells maybe?
-        zero_tr = self._get_face(border_order[0]).get_cell_color(FacePosition.TOP_RIGHT)
-        one_br = self._get_face(border_order[1]).get_cell_color(FacePosition.BOTTOM_RIGHT)
-        one_mr = self._get_face(border_order[1]).get_cell_color(FacePosition.MIDDLE_RIGHT)
-        one_tr = self._get_face(border_order[1]).get_cell_color(FacePosition.TOP_RIGHT)
-        two_br = self._get_face(border_order[2]).get_cell_color(FacePosition.BOTTOM_RIGHT)
-        two_mr = self._get_face(border_order[2]).get_cell_color(FacePosition.MIDDLE_RIGHT)
-        two_tr = self._get_face(border_order[2]).get_cell_color(FacePosition.TOP_RIGHT)
-        three_br = self._get_face(border_order[3]).get_cell_color(FacePosition.BOTTOM_RIGHT)
-        three_mr = self._get_face(border_order[3]).get_cell_color(FacePosition.MIDDLE_RIGHT)
-        three_tr = self._get_face(border_order[3]).get_cell_color(FacePosition.TOP_RIGHT)
-        zero_br = self._get_face(border_order[0]).get_cell_color(FacePosition.BOTTOM_RIGHT)
-        zero_mr = self._get_face(border_order[0]).get_cell_color(FacePosition.MIDDLE_RIGHT)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_CENTER, tl)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_RIGHT, tc)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.MIDDLE_RIGHT, tr)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_RIGHT, mr)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_CENTER, br)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_LEFT, bc)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.MIDDLE_LEFT, bl)
+        self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_LEFT, ml)
 
-        self._get_face(border_order[1]).set_cell_color(FacePosition.BOTTOM_RIGHT, zero_tr)
-        self._get_face(border_order[1]).set_cell_color(FacePosition.MIDDLE_RIGHT, one_br)
-        self._get_face(border_order[1]).set_cell_color(FacePosition.TOP_RIGHT, one_mr)
-        self._get_face(border_order[2]).set_cell_color(FacePosition.BOTTOM_RIGHT, one_tr)
-        self._get_face(border_order[2]).set_cell_color(FacePosition.MIDDLE_RIGHT, two_br)
-        self._get_face(border_order[2]).set_cell_color(FacePosition.TOP_RIGHT, two_mr)
-        self._get_face(border_order[3]).set_cell_color(FacePosition.BOTTOM_RIGHT, two_tr)
-        self._get_face(border_order[3]).set_cell_color(FacePosition.MIDDLE_RIGHT, three_br)
-        self._get_face(border_order[3]).set_cell_color(FacePosition.TOP_RIGHT, three_mr)
-        self._get_face(border_order[0]).set_cell_color(FacePosition.BOTTOM_RIGHT, three_tr)
-        self._get_face(border_order[0]).set_cell_color(FacePosition.MIDDLE_RIGHT, zero_br)
-        self._get_face(border_order[0]).set_cell_color(FacePosition.TOP_RIGHT, zero_mr)
+    def _rotate_face_border(self, rotate_data: RotationData):
+        # todo consider: would it be better to compact this down to list comprehensions or loops, or is it better to
+        #    just leave it explicit like this? This code will only ever work with a 3x3x3 as far as I'm concerned,
+        #    so really leaving it like this is NBD, makes the pattern somewhat readable, and it's not going to make a
+        #    difference performance wise, but would refactoring it to list comps or loops make the pattern more readable?
+        #    this is a future chris problem ;p
+        # * Note we need to pull _all_ of the colors out before we start re-assigning. Otherwise we'll end up dragging
+        # * one color across all of the cells.
+        # todo consider: hmmmm unless we pull the color backwards vs pushing it forwards! that could make this a bit
+        #     more compact, but get the rest working first and then come back and try a refactor
+        one_br = self._get_face(rotate_data.border_order[1]).get_cell_color(rotate_data.face_position_move_order[0])
+        one_mr = self._get_face(rotate_data.border_order[1]).get_cell_color(rotate_data.face_position_move_order[1])
+        one_tr = self._get_face(rotate_data.border_order[1]).get_cell_color(rotate_data.face_position_move_order[2])
+        two_br = self._get_face(rotate_data.border_order[2]).get_cell_color(rotate_data.face_position_move_order[0])
+        two_mr = self._get_face(rotate_data.border_order[2]).get_cell_color(rotate_data.face_position_move_order[1])
+        two_tr = self._get_face(rotate_data.border_order[2]).get_cell_color(rotate_data.face_position_move_order[2])
+        three_br = self._get_face(rotate_data.border_order[3]).get_cell_color(rotate_data.face_position_move_order[0])
+        three_mr = self._get_face(rotate_data.border_order[3]).get_cell_color(rotate_data.face_position_move_order[1])
+        three_tr = self._get_face(rotate_data.border_order[3]).get_cell_color(rotate_data.face_position_move_order[2])
+        zero_br = self._get_face(rotate_data.border_order[0]).get_cell_color(rotate_data.face_position_move_order[0])
+        zero_mr = self._get_face(rotate_data.border_order[0]).get_cell_color(rotate_data.face_position_move_order[1])
+        zero_tr = self._get_face(rotate_data.border_order[0]).get_cell_color(rotate_data.face_position_move_order[2])
+
+        self._get_face(rotate_data.border_order[1]).set_cell_color(rotate_data.face_position_move_order[0], zero_tr)
+        self._get_face(rotate_data.border_order[1]).set_cell_color(rotate_data.face_position_move_order[1], one_br)
+        self._get_face(rotate_data.border_order[1]).set_cell_color(rotate_data.face_position_move_order[2], one_mr)
+        self._get_face(rotate_data.border_order[2]).set_cell_color(rotate_data.face_position_move_order[0], one_tr)
+        self._get_face(rotate_data.border_order[2]).set_cell_color(rotate_data.face_position_move_order[1], two_br)
+        self._get_face(rotate_data.border_order[2]).set_cell_color(rotate_data.face_position_move_order[2], two_mr)
+        self._get_face(rotate_data.border_order[3]).set_cell_color(rotate_data.face_position_move_order[0], two_tr)
+        self._get_face(rotate_data.border_order[3]).set_cell_color(rotate_data.face_position_move_order[1], three_br)
+        self._get_face(rotate_data.border_order[3]).set_cell_color(rotate_data.face_position_move_order[2], three_mr)
+        self._get_face(rotate_data.border_order[0]).set_cell_color(rotate_data.face_position_move_order[0], three_tr)
+        self._get_face(rotate_data.border_order[0]).set_cell_color(rotate_data.face_position_move_order[1], zero_br)
+        self._get_face(rotate_data.border_order[0]).set_cell_color(rotate_data.face_position_move_order[2], zero_mr)
 
     def set_face_color(self, face: Face, color: Tuple[int, int, int]):
         face = self._get_face(face)

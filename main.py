@@ -148,17 +148,35 @@ def get_face_colors():
     cube.set_face_color(Face.RIGHT, color=right_color)
 
 
-get_face_colors()
-cube.set_rotation(Rotations.R)
-while True:
-    # if cube.is_rotating():
-    print(f"cube is rotating: ${cube.is_rotating()}")
-    cube.rotate()
-    state = cube.get_state()
-
+def update_state(state):
+    global current_state
     if current_state != state:
         current_state = state
         print(current_state)
         update_pixels(current_state)
         pixels.show()
+
+
+get_face_colors()
+switch = False
+cube.set_rotation(Rotations.R)
+while True:
+    print(f"cube is rotating: ${cube.is_rotating()}")
+    if cube.is_rotating():
+        state = cube.get_state()
+        update_state(state)
+        cube.rotate()
+    else:
+        switch != switch
+        if switch:
+            cube.set_rotation(Rotations.R)
+        else:
+            cube.set_rotation(Rotations.U)
+        cube.rotate()
+
+    # # if cube.is_rotating():
+    # print(f"cube is rotating: ${cube.is_rotating()}")
+    # cube.rotate()
+    # state = cube.get_state()
+
     time.sleep(0.05)
