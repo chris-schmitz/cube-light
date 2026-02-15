@@ -14,7 +14,8 @@ pixels = neopixel.NeoPixel(
     auto_write=False
 )
 
-top = CubeFace(Face.TOP, [
+# ^ Good
+up = CubeFace(Face.UP, [
     Cell(FacePosition.TOP_LEFT, 8),
     Cell(FacePosition.TOP_CENTER, 11),
     Cell(FacePosition.TOP_RIGHT, 13),
@@ -26,46 +27,6 @@ top = CubeFace(Face.TOP, [
     Cell(FacePosition.BOTTOM_LEFT, 3),
     Cell(FacePosition.BOTTOM_CENTER, 1),
     Cell(FacePosition.BOTTOM_RIGHT, 18),
-])
-left = CubeFace(Face.LEFT, [
-    Cell(FacePosition.TOP_LEFT, 9),
-    Cell(FacePosition.TOP_CENTER, 7),
-    Cell(FacePosition.TOP_RIGHT, 5),
-
-    Cell(FacePosition.MIDDLE_LEFT, 30),
-    Cell(FacePosition.MIDDLE_CENTER, 29),
-    Cell(FacePosition.MIDDLE_RIGHT, 28),
-
-    Cell(FacePosition.BOTTOM_LEFT, 48),
-    Cell(FacePosition.BOTTOM_CENTER, 52),
-    Cell(FacePosition.BOTTOM_RIGHT, 33),
-])
-# ! note these are def not in the right positions
-bottom = CubeFace(Face.BOTTOM, cells=[
-    Cell(FacePosition.TOP_LEFT, 34),
-    Cell(FacePosition.TOP_CENTER, 37),
-    Cell(FacePosition.TOP_RIGHT, 39),
-
-    Cell(FacePosition.MIDDLE_LEFT, 51),
-    Cell(FacePosition.MIDDLE_CENTER, 53),
-    Cell(FacePosition.MIDDLE_RIGHT, 42),
-
-    Cell(FacePosition.BOTTOM_LEFT, 50),
-    Cell(FacePosition.BOTTOM_CENTER, 47),
-    Cell(FacePosition.BOTTOM_RIGHT, 44),
-])
-front = CubeFace(Face.FRONT, cells=[
-    Cell(FacePosition.TOP_LEFT, 4),
-    Cell(FacePosition.TOP_CENTER, 2),
-    Cell(FacePosition.TOP_RIGHT, 20),
-
-    Cell(FacePosition.MIDDLE_LEFT, 27),
-    Cell(FacePosition.MIDDLE_RIGHT, 25),
-    Cell(FacePosition.MIDDLE_CENTER, 26),
-
-    Cell(FacePosition.BOTTOM_LEFT, 35),
-    Cell(FacePosition.BOTTOM_CENTER, 36),
-    Cell(FacePosition.BOTTOM_RIGHT, 38),
 ])
 
 back = CubeFace(Face.BACK, cells=[
@@ -82,6 +43,34 @@ back = CubeFace(Face.BACK, cells=[
     Cell(FacePosition.BOTTOM_RIGHT, 14),
 ])
 
+down = CubeFace(Face.DOWN, cells=[
+    Cell(FacePosition.TOP_LEFT, 34),
+    Cell(FacePosition.TOP_CENTER, 37),
+    Cell(FacePosition.TOP_RIGHT, 39),
+
+    Cell(FacePosition.MIDDLE_LEFT, 51),
+    Cell(FacePosition.MIDDLE_CENTER, 53),
+    Cell(FacePosition.MIDDLE_RIGHT, 42),
+
+    Cell(FacePosition.BOTTOM_LEFT, 50),
+    Cell(FacePosition.BOTTOM_CENTER, 47),
+    Cell(FacePosition.BOTTOM_RIGHT, 44),
+])
+
+front = CubeFace(Face.FRONT, cells=[
+    Cell(FacePosition.TOP_LEFT, 4),
+    Cell(FacePosition.TOP_CENTER, 2),
+    Cell(FacePosition.TOP_RIGHT, 20),
+
+    Cell(FacePosition.MIDDLE_LEFT, 27),
+    Cell(FacePosition.MIDDLE_RIGHT, 25),
+    Cell(FacePosition.MIDDLE_CENTER, 26),
+
+    Cell(FacePosition.BOTTOM_LEFT, 35),
+    Cell(FacePosition.BOTTOM_CENTER, 36),
+    Cell(FacePosition.BOTTOM_RIGHT, 38),
+])
+
 right = CubeFace(Face.RIGHT, cells=[
     Cell(FacePosition.TOP_LEFT, 19),
     Cell(FacePosition.TOP_RIGHT, 15),
@@ -95,8 +84,21 @@ right = CubeFace(Face.RIGHT, cells=[
     Cell(FacePosition.BOTTOM_CENTER, 41),
     Cell(FacePosition.BOTTOM_RIGHT, 43),
 ])
+left = CubeFace(Face.LEFT, [
+    Cell(FacePosition.TOP_LEFT, 9),
+    Cell(FacePosition.TOP_CENTER, 7),
+    Cell(FacePosition.TOP_RIGHT, 5),
 
-cube = Cube(left_face=left, top_face=top, bottom_face=bottom, front_face=front, back_face=back, right_face=right)
+    Cell(FacePosition.MIDDLE_LEFT, 30),
+    Cell(FacePosition.MIDDLE_CENTER, 29),
+    Cell(FacePosition.MIDDLE_RIGHT, 28),
+
+    Cell(FacePosition.BOTTOM_LEFT, 48),
+    Cell(FacePosition.BOTTOM_CENTER, 52),
+    Cell(FacePosition.BOTTOM_RIGHT, 33),
+])
+
+cube = Cube(left_face=left, up_face=up, down_face=down, front_face=front, back_face=back, right_face=right)
 
 current_state = cube.get_state()
 
@@ -111,7 +113,7 @@ def update_pixels(strip_colors):
 yellow = (255, 255, 0)
 blue = (0, 0, 255)
 red = (255, 0, 0)
-orange = (255, 98, 0)
+orange = (225, 98, 0)
 green = (0, 255, 0)
 white = (200, 200, 200)
 face_color_choices = [yellow, blue, red, orange, green, white]
@@ -122,26 +124,36 @@ i = 0
 def get_face_colors():
     global i
     # Use modulo (%) to wrap the index back to 0 when it exceeds the list length
-    top_color = face_color_choices[i % n]
-    left_color = face_color_choices[(i + 1) % n]
-    bottom_color = face_color_choices[(i + 2) % n]
-    back_color = face_color_choices[(i + 3) % n]
-    front_color = face_color_choices[(i + 4) % n]
-    right_color = face_color_choices[(i + 5) % n]
+    up_color = yellow
+    left_color = green
+    bottom_color = white
+    back_color = red
+    front_color = orange
+    right_color = blue
+    # ^ face cycling
+    # up_color = face_color_choices[i % n]
+    # left_color = face_color_choices[(i + 1) % n]
+    # bottom_color = face_color_choices[(i + 2) % n]
+    # back_color = face_color_choices[(i + 3) % n]
+    # front_color = face_color_choices[(i + 4) % n]
+    # right_color = face_color_choices[(i + 5) % n]
 
     i = (i + 1) % n
 
-    cube.set_face_color(Face.TOP, color=top_color)
+    cube.set_face_color(Face.UP, color=up_color)
     cube.set_face_color(Face.LEFT, color=left_color)
-    cube.set_face_color(Face.BOTTOM, color=bottom_color)
+    cube.set_face_color(Face.DOWN, color=bottom_color)
     cube.set_face_color(Face.FRONT, color=front_color)
     cube.set_face_color(Face.BACK, color=back_color)
     cube.set_face_color(Face.RIGHT, color=right_color)
 
 
 get_face_colors()
+cube.set_rotation(Rotations.R)
 while True:
-    cube.rotate(Rotations.R)
+    # if cube.is_rotating():
+    print(f"cube is rotating: ${cube.is_rotating()}")
+    cube.rotate()
     state = cube.get_state()
 
     if current_state != state:
@@ -149,4 +161,4 @@ while True:
         print(current_state)
         update_pixels(current_state)
         pixels.show()
-    time.sleep(0.5)
+    time.sleep(0.05)

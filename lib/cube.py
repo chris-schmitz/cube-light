@@ -14,12 +14,12 @@ class FacePosition:
 
 
 class Face:
-    TOP = 'top'
+    UP = 'up'
     LEFT = 'left'
     RIGHT = 'right'
     FRONT = 'front'
     BACK = 'back'
-    BOTTOM = 'bottom'
+    DOWN = 'down'
 
 
 # * During any rotation there are two concepts that we have to account for
@@ -32,6 +32,7 @@ class RotationData:
 
 
 class Rotations:
+    # ^ https://jperm.net/3x3/moves
     R = 'r'
     R_PRIME = 'r\''
     L = 'l'
@@ -40,7 +41,6 @@ class Rotations:
     F_PRIME = 'f\''
     B = 'b'
     B_PRIME = 'b\''
-    # todo: switch out all references to "TOP" to "UP"
     U = 'u'
     U_PRIME = 'u\''
     D = 'd'
@@ -51,12 +51,12 @@ class Rotations:
         if symbol == Rotations.R:
             return RotationData(
                 Face.RIGHT,
-                [Face.FRONT, Face.TOP, Face.BACK, Face.BOTTOM]
+                [Face.FRONT, Face.UP, Face.BACK, Face.DOWN]
             )
         elif symbol == Rotations.F:
             return RotationData(
                 Face.FRONT,
-                [Face.TOP, Face.RIGHT, Face.BOTTOM, Face.LEFT]
+                [Face.UP, Face.RIGHT, Face.DOWN, Face.LEFT]
             )
         else:
             raise UnknownRotationError(symbol)
@@ -186,75 +186,79 @@ class CubeFace:
 
 class Cube:
     def __init__(self,
-                 top_face: CubeFace,
-                 bottom_face: CubeFace,
+                 up_face: CubeFace,
+                 down_face: CubeFace,
                  left_face: CubeFace,
                  right_face: CubeFace,
                  front_face: CubeFace,
                  back_face: CubeFace,
                  ):
-        self.faces = {
-            Face.TOP: top_face,
-            Face.BOTTOM: bottom_face,
+        self._active_rotation_count = 0
+        self._is_rotating = False
+        self._current_rotation_symbol = None
+
+        self._faces = {
+            Face.UP: up_face,
+            Face.DOWN: down_face,
             Face.LEFT: left_face,
             Face.RIGHT: right_face,
             Face.FRONT: front_face,
             Face.BACK: back_face,
         }
 
+    def set_rotation(self, rotation_symbol: Rotations):
+        self._current_rotation_symbol = rotation_symbol
+
+    def is_rotating(self):
+        return self._is_rotating
+
     def _get_face(self, face_name: Face) -> CubeFace:
-        return self.faces[face_name]
+        return self._faces[face_name]
 
-    def rotate(self, rotation_symbol: str):
-        # ^ from here we'd need to:
-        # ^ determine what face is rotating from the rotation notation
-        # ^ create a temp state to hold the new cell data
-        # ^ set the temp state with the movement of each cell involved in rotation
-        # ^ write the temp state to the existing cell states
-        # ? would it be better to mutate the existing cells or just new up a bunch of new cells and replace them?
-        rotation_data = Rotations.get_rotation_data(rotation_symbol)
+    def rotate(self):
+        if self._active_rotation_count < 3:
+            self._active_rotation_count += 1
+            self._is_rotating = True
 
-        self._rotate_face(rotation_data.face)
-        self._rotate_face_edges(rotation_data.border_order)
-        # ^ rotate_face will specifically rotate all of the cells in the face for a tick of 3
-        # updated_face_cells: Dict[Face, List[Cell]] = self._get_face(rotation_data.face).rotate_face(rotation_data.face)
+            rotation_data = Rotations.get_rotation_data(self._current_rotation_symbol)
 
-        # # ^ rotate_border will reassign cells from one border to the next in the order for a tick of 3
-        # updated_border_cells: List[Dict[Face, List[Cell]]] = self.rotate_border(rotation_data.border_order)
-        #
-        # self.set_face_state(rotation_data.face, updated_face_cells)
-        # for (update in updated_border_cells):
-        #     self.set_face_state(update, )
-        # self.set_face_state(rotation_data.face, updated_face_cells)
-        # new_state = self.get_face_assignments()
+            self._rotate_face(rotation_data.face)
+            self._rotate_face_edges(rotation_data.border_order)
+        else:
+            self._active_rotation_count = 0
+            self._is_rotating = False
 
     def _rotate_face(self, face: Face):
         # todo get face from self, call it's rotate method
         pass
 
     def _rotate_face_edges(self, border_order: List[Face]):
-        # ^ so here we should be:
-        # - loop through each face
-        # - store the right column state of the given face
-        # - get next face -> set it's right column to the stored state
-        # - do that in a loop till the end
-        # - after the loop, set the remaining grabbed state to the first face's right column
-        # ^ sounds like a dowhile loop
+        # todo: we can prob shove this into a list and then loop over it to set the cells maybe?
+        zero_tr = self._get_face(border_order[0]).get_cell_color(FacePosition.TOP_RIGHT)
+        one_br = self._get_face(border_order[1]).get_cell_color(FacePosition.BOTTOM_RIGHT)
+        one_mr = self._get_face(border_order[1]).get_cell_color(FacePosition.MIDDLE_RIGHT)
+        one_tr = self._get_face(border_order[1]).get_cell_color(FacePosition.TOP_RIGHT)
+        two_br = self._get_face(border_order[2]).get_cell_color(FacePosition.BOTTOM_RIGHT)
+        two_mr = self._get_face(border_order[2]).get_cell_color(FacePosition.MIDDLE_RIGHT)
+        two_tr = self._get_face(border_order[2]).get_cell_color(FacePosition.TOP_RIGHT)
+        three_br = self._get_face(border_order[3]).get_cell_color(FacePosition.BOTTOM_RIGHT)
+        three_mr = self._get_face(border_order[3]).get_cell_color(FacePosition.MIDDLE_RIGHT)
+        three_tr = self._get_face(border_order[3]).get_cell_color(FacePosition.TOP_RIGHT)
+        zero_br = self._get_face(border_order[0]).get_cell_color(FacePosition.BOTTOM_RIGHT)
+        zero_mr = self._get_face(border_order[0]).get_cell_color(FacePosition.MIDDLE_RIGHT)
 
-        # todo: if this works collapse back into the loop
-        def get_color_from_assignment_list(led_assignments: List[LedAssignmentData]):
-            return [assignment.color for assignment in led_assignments]
-
-        # todo: cleanup later, basically we have to grab all of the colors before assigning them or we just pull
-        #   one color along all of the sides. we can pack it into a list comprehension and then a for loop
-        border_one_color = get_color_from_assignment_list(self._get_face(border_order[0]).get_right_column())
-        border_two_color = get_color_from_assignment_list(self._get_face(border_order[1]).get_right_column())
-        border_three_color = get_color_from_assignment_list(self._get_face(border_order[2]).get_right_column())
-        border_four_color = get_color_from_assignment_list(self._get_face(border_order[3]).get_right_column())
-        self._get_face(border_order[0]).set_right_column(border_four_color)
-        self._get_face(border_order[1]).set_right_column(border_one_color)
-        self._get_face(border_order[2]).set_right_column(border_two_color)
-        self._get_face(border_order[3]).set_right_column(border_three_color)
+        self._get_face(border_order[1]).set_cell_color(FacePosition.BOTTOM_RIGHT, zero_tr)
+        self._get_face(border_order[1]).set_cell_color(FacePosition.MIDDLE_RIGHT, one_br)
+        self._get_face(border_order[1]).set_cell_color(FacePosition.TOP_RIGHT, one_mr)
+        self._get_face(border_order[2]).set_cell_color(FacePosition.BOTTOM_RIGHT, one_tr)
+        self._get_face(border_order[2]).set_cell_color(FacePosition.MIDDLE_RIGHT, two_br)
+        self._get_face(border_order[2]).set_cell_color(FacePosition.TOP_RIGHT, two_mr)
+        self._get_face(border_order[3]).set_cell_color(FacePosition.BOTTOM_RIGHT, two_tr)
+        self._get_face(border_order[3]).set_cell_color(FacePosition.MIDDLE_RIGHT, three_br)
+        self._get_face(border_order[3]).set_cell_color(FacePosition.TOP_RIGHT, three_mr)
+        self._get_face(border_order[0]).set_cell_color(FacePosition.BOTTOM_RIGHT, three_tr)
+        self._get_face(border_order[0]).set_cell_color(FacePosition.MIDDLE_RIGHT, zero_br)
+        self._get_face(border_order[0]).set_cell_color(FacePosition.TOP_RIGHT, zero_mr)
 
     def set_face_color(self, face: Face, color: Tuple[int, int, int]):
         face = self._get_face(face)
@@ -265,7 +269,7 @@ class Cube:
 
     def get_state(self):
         # todo: abstract into conceptual methods
-        face_state = [face.get_state() for _, face in self.faces.items()]
+        face_state = [face.get_state() for _, face in self._faces.items()]
         assignments = []
         for assignment_list in face_state:
             for assignment in assignment_list:
@@ -290,4 +294,4 @@ class Cube:
             return False
 
     def get_face_assignments(self, face: Face) -> List[LedAssignmentData]:
-        return self.faces[face].get_state()
+        return self._faces[face].get_state()

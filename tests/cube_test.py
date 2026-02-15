@@ -13,15 +13,15 @@ class TestCube:
             Cell(FacePosition.TOP_RIGHT, 2),
         ]
         cube = Cube(
-            top_face=CubeFace(Face.TOP, cells),
-            bottom_face=CubeFace(Face.BOTTOM, []),
+            up_face=CubeFace(Face.UP, cells),
+            down_face=CubeFace(Face.DOWN, []),
             left_face=CubeFace(Face.LEFT, []),
             right_face=CubeFace(Face.RIGHT, []),
             front_face=CubeFace(Face.FRONT, []),
             back_face=CubeFace(Face.BACK, []),
         )
 
-        cube.set_face_color(Face.TOP, (255, 255, 255))
+        cube.set_face_color(Face.UP, (255, 255, 255))
 
         assert cube.get_state() == [(255, 255, 255), (255, 255, 255), (255, 255, 255)]
 
@@ -32,8 +32,8 @@ class TestCube:
             Cell(FacePosition.TOP_CENTER, 1),
         ]
         cube = Cube(
-            top_face=CubeFace(Face.TOP, top_cells),
-            bottom_face=CubeFace(Face.BOTTOM, []),
+            up_face=CubeFace(Face.UP, top_cells),
+            down_face=CubeFace(Face.DOWN, []),
             left_face=CubeFace(Face.LEFT, []),
             right_face=CubeFace(Face.RIGHT, []),
             front_face=CubeFace(Face.FRONT, []),
@@ -44,24 +44,24 @@ class TestCube:
 
         assert actual == [(0, 0, 0), (0, 0, 0), (0, 0, 0)]
 
-    def test_can_set_specific_cell_colors_on_a_single_face_top(self):
+    def test_can_set_specific_cell_colors_on_a_single_face_up(self):
         top_cells = [
             Cell(FacePosition.TOP_RIGHT, 2),
             Cell(FacePosition.TOP_LEFT, 0),
             Cell(FacePosition.TOP_CENTER, 1),
         ]
         cube = Cube(
-            top_face=CubeFace(Face.TOP, top_cells),
-            bottom_face=CubeFace(Face.BOTTOM, []),
+            up_face=CubeFace(Face.UP, top_cells),
+            down_face=CubeFace(Face.DOWN, []),
             left_face=CubeFace(Face.LEFT, []),
             right_face=CubeFace(Face.RIGHT, []),
             front_face=CubeFace(Face.FRONT, []),
             back_face=CubeFace(Face.BACK, []),
         )
 
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_LEFT, (255, 0, 0))
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_CENTER, (0, 0, 255))
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_RIGHT, (0, 255, 0))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_LEFT, (255, 0, 0))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_CENTER, (0, 0, 255))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_RIGHT, (0, 255, 0))
         actual = cube.get_state()
 
         assert actual == [(255, 0, 0), (0, 0, 255), (0, 255, 0)]
@@ -73,8 +73,8 @@ class TestCube:
             Cell(FacePosition.TOP_CENTER, 1),
         ]
         cube = Cube(
-            top_face=CubeFace(Face.TOP, top_cells),
-            bottom_face=CubeFace(Face.BOTTOM, []),
+            up_face=CubeFace(Face.UP, top_cells),
+            down_face=CubeFace(Face.DOWN, []),
             left_face=CubeFace(Face.LEFT, []),
             right_face=CubeFace(Face.RIGHT, []),
             front_face=CubeFace(Face.FRONT, []),
@@ -82,15 +82,15 @@ class TestCube:
         )
         # * same setup as the last test, but we're making all fo the colors consistent so the
         # * changed one stands out better visually in the result
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_LEFT, (255, 0, 0))
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_CENTER, (255, 0, 0))
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_RIGHT, (255, 0, 0))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_LEFT, (255, 0, 0))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_CENTER, (255, 0, 0))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_RIGHT, (255, 0, 0))
         colors_set = cube.get_state()
         # * so confirming, all of the cells are set to red
         assert [(255, 0, 0), (255, 0, 0), (255, 0, 0)] == colors_set
 
         # * and now we change only one
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_CENTER, (255, 255, 255))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_CENTER, (255, 255, 255))
         actual = cube.get_state()
 
         assert actual == [(255, 0, 0), (255, 255, 255), (255, 0, 0)]
@@ -107,15 +107,15 @@ class TestCube:
             Cell(FacePosition.TOP_LEFT, 0),
         ]
         cube = Cube(
-            top_face=CubeFace(Face.TOP, top_cells),
-            bottom_face=CubeFace(Face.BOTTOM, []),
+            up_face=CubeFace(Face.UP, top_cells),
+            down_face=CubeFace(Face.DOWN, []),
             left_face=CubeFace(Face.LEFT, []),
             right_face=CubeFace(Face.RIGHT, []),
             front_face=CubeFace(Face.FRONT, []),
             back_face=CubeFace(Face.BACK, []),
         )
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_LEFT, (255, 255, 255))
-        cube.set_cell_color(Face.TOP, FacePosition.TOP_RIGHT, (255, 255, 255))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_LEFT, (255, 255, 255))
+        cube.set_cell_color(Face.UP, FacePosition.TOP_RIGHT, (255, 255, 255))
 
         actual = cube.get_state()
 
@@ -129,17 +129,13 @@ class TestCube:
         ]
 
     def test_can_rotate(self, cube):
-        cube.set_face_color(Face.TOP, YELLOW)
+        cube.set_face_color(Face.UP, YELLOW)
         cube.set_face_color(Face.FRONT, BLUE)
-        cube.set_face_color(Face.BOTTOM, WHITE)
+        cube.set_face_color(Face.DOWN, WHITE)
         cube.set_face_color(Face.RIGHT, RED)
         cube.set_face_color(Face.BACK, GREEN)
 
-        right_before_rotation = cube.get_face_assignments(Face.RIGHT)
-        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, right_before_rotation).color == RED
-        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, right_before_rotation).color == RED
-        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, right_before_rotation).color == RED
-        top_before_rotation = cube.get_face_assignments(Face.TOP)
+        top_before_rotation = cube.get_face_assignments(Face.UP)
         assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, top_before_rotation).color == YELLOW
         assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, top_before_rotation).color == YELLOW
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, top_before_rotation).color == YELLOW
@@ -147,7 +143,7 @@ class TestCube:
         assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, back_before_rotation).color == GREEN
         assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, back_before_rotation).color == GREEN
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, back_before_rotation).color == GREEN
-        bottom_before_rotation = cube.get_face_assignments(Face.BOTTOM)
+        bottom_before_rotation = cube.get_face_assignments(Face.DOWN)
         assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, bottom_before_rotation).color == WHITE
         assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, bottom_before_rotation).color == WHITE
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, bottom_before_rotation).color == WHITE
@@ -155,30 +151,117 @@ class TestCube:
         assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, front_before_rotation).color == BLUE
         assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, front_before_rotation).color == BLUE
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, front_before_rotation).color == BLUE
+        right_before_rotation = cube.get_face_assignments(Face.RIGHT)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, right_before_rotation).color == RED
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, right_before_rotation).color == RED
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, right_before_rotation).color == RED
+        assert cube.is_rotating() == False
 
         # ^ https://jperm.net/3x3/moves
-        cube.rotate(Rotations.R)
+        cube.set_rotation(Rotations.R)
+        cube.rotate()
 
+        assert cube.is_rotating() == True
+        top_after_rotation = cube.get_face_assignments(Face.UP)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, top_after_rotation).color == YELLOW
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, top_after_rotation).color == YELLOW
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, top_after_rotation).color == BLUE
+        back_after_rotation = cube.get_face_assignments(Face.BACK)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, back_after_rotation).color == GREEN
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, back_after_rotation).color == GREEN
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, back_after_rotation).color == YELLOW
+        bottom_after_rotation = cube.get_face_assignments(Face.DOWN)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, bottom_after_rotation).color == WHITE
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, bottom_after_rotation).color == WHITE
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, bottom_after_rotation).color == GREEN
+        front_after_rotation = cube.get_face_assignments(Face.FRONT)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, front_after_rotation).color == BLUE
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, front_after_rotation).color == BLUE
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, front_after_rotation).color == WHITE
         right_after_rotation = cube.get_face_assignments(Face.RIGHT)
         assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, right_after_rotation).color == RED
         assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, right_after_rotation).color == RED
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, right_after_rotation).color == RED
-        top_after_rotation = cube.get_face_assignments(Face.TOP)
-        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, top_after_rotation).color == BLUE
-        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, top_after_rotation).color == BLUE
+
+    def test_can_rotate_up(self, cube):
+        cube.set_face_color(Face.UP, YELLOW)
+        cube.set_face_color(Face.FRONT, BLUE)
+        cube.set_face_color(Face.DOWN, WHITE)
+        cube.set_face_color(Face.RIGHT, RED)
+        cube.set_face_color(Face.BACK, GREEN)
+
+        top_before_rotation = cube.get_face_assignments(Face.UP)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, top_before_rotation).color == YELLOW
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, top_before_rotation).color == YELLOW
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, top_before_rotation).color == YELLOW
+        back_before_rotation = cube.get_face_assignments(Face.BACK)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, back_before_rotation).color == GREEN
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, back_before_rotation).color == GREEN
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, back_before_rotation).color == GREEN
+        bottom_before_rotation = cube.get_face_assignments(Face.DOWN)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, bottom_before_rotation).color == WHITE
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, bottom_before_rotation).color == WHITE
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, bottom_before_rotation).color == WHITE
+        front_before_rotation = cube.get_face_assignments(Face.FRONT)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, front_before_rotation).color == BLUE
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, front_before_rotation).color == BLUE
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, front_before_rotation).color == BLUE
+        right_before_rotation = cube.get_face_assignments(Face.RIGHT)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, right_before_rotation).color == RED
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, right_before_rotation).color == RED
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, right_before_rotation).color == RED
+        assert cube.is_rotating() == False
+
+        # ^ https://jperm.net/3x3/moves
+        cube.set_rotation(Rotations.U)
+        cube.rotate()
+
+        assert cube.is_rotating() == True
+        top_after_rotation = cube.get_face_assignments(Face.UP)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, top_after_rotation).color == YELLOW
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, top_after_rotation).color == YELLOW
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, top_after_rotation).color == BLUE
         back_after_rotation = cube.get_face_assignments(Face.BACK)
-        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, back_after_rotation).color == YELLOW
-        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, back_after_rotation).color == YELLOW
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, back_after_rotation).color == GREEN
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, back_after_rotation).color == GREEN
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, back_after_rotation).color == YELLOW
-        bottom_after_rotation = cube.get_face_assignments(Face.BOTTOM)
-        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, bottom_after_rotation).color == GREEN
-        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, bottom_after_rotation).color == GREEN
+        bottom_after_rotation = cube.get_face_assignments(Face.DOWN)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, bottom_after_rotation).color == WHITE
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, bottom_after_rotation).color == WHITE
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, bottom_after_rotation).color == GREEN
         front_after_rotation = cube.get_face_assignments(Face.FRONT)
-        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, front_after_rotation).color == WHITE
-        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, front_after_rotation).color == WHITE
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, front_after_rotation).color == BLUE
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, front_after_rotation).color == BLUE
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, front_after_rotation).color == WHITE
+        right_after_rotation = cube.get_face_assignments(Face.RIGHT)
+        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, right_after_rotation).color == RED
+        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, right_after_rotation).color == RED
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, right_after_rotation).color == RED
+
+    def test_can_track_active_rotation_state(self, cube):
+        # todo: think of a better name for this test :P
+        # * We need to track if a rotation is active or not. Since we're doing one-cell-at-a-time animation it means
+        # * a full rotation of one side happens 3 steps at a time, i.e. if we're animating each color to move one cell
+        # * at a time until one column has fully replaced another and we have 3 cells per column, we need to move colors
+        # * three times per "rotation", Otherwise we're moving whole columns at a time.
+        # * All that said, the Cube isn't controlling the LEDs, it's just tracking the state and passing it back to
+        # * whatever code is handling the "tick", so adding in the concept of an active rotation means that whatever _is_
+        # * controlling the LEDs can ask the cube for a rotation iteration and know if the full rotation is done or not
+        # * before moving on to the next rotation.
+        assert cube.is_rotating() == False
+
+        cube.set_rotation(Rotations.R)
+        assert cube.is_rotating() == False
+
+        cube.rotate()
+        assert cube.is_rotating() == True
+        cube.rotate()
+        assert cube.is_rotating() == True
+        cube.rotate()
+        assert cube.is_rotating() == True
+        cube.rotate()
+        assert cube.is_rotating() == False
+        # todo asert that nothing changes in the state here??
 
     @pytest.fixture
     def cube(self) -> Cube:
@@ -265,8 +348,8 @@ class TestCube:
             Cell(FacePosition.BOTTOM_RIGHT, 19),
         ]
         return Cube(
-            top_face=CubeFace(Face.TOP, top_cells),
-            bottom_face=CubeFace(Face.BOTTOM, bottom_cells),
+            up_face=CubeFace(Face.UP, top_cells),
+            down_face=CubeFace(Face.DOWN, bottom_cells),
             left_face=CubeFace(Face.LEFT, left_cells),
             right_face=CubeFace(Face.RIGHT, right_cells),
             front_face=CubeFace(Face.FRONT, front_cells),
