@@ -79,12 +79,48 @@ class Rotations:
                     BorderRotation(Face.DOWN, FacePosition.TOP_RIGHT),
                 ]
             )
-        # elif symbol == Rotations.F:
-        #     return RotationData(
-        #         Face.FRONT,
-        #         [Face.UP, Face.RIGHT, Face.DOWN, Face.LEFT],
-        #         []
-        #     )
+        elif symbol == Rotations.F:
+            return RotationData(
+                Face.FRONT,
+                [
+                    BorderRotation(Face.UP, FacePosition.BOTTOM_LEFT),
+                    BorderRotation(Face.UP, FacePosition.BOTTOM_CENTER),
+                    BorderRotation(Face.UP, FacePosition.BOTTOM_RIGHT),
+
+                    BorderRotation(Face.RIGHT, FacePosition.TOP_LEFT),
+                    BorderRotation(Face.RIGHT, FacePosition.MIDDLE_LEFT),
+                    BorderRotation(Face.RIGHT, FacePosition.BOTTOM_LEFT),
+
+                    BorderRotation(Face.DOWN, FacePosition.TOP_RIGHT),
+                    BorderRotation(Face.DOWN, FacePosition.TOP_CENTER),
+                    BorderRotation(Face.DOWN, FacePosition.TOP_LEFT),
+
+                    BorderRotation(Face.LEFT, FacePosition.BOTTOM_RIGHT),
+                    BorderRotation(Face.LEFT, FacePosition.MIDDLE_RIGHT),
+                    BorderRotation(Face.LEFT, FacePosition.TOP_RIGHT),
+                ]
+            )
+        elif symbol == Rotations.L:
+            return RotationData(
+                Face.LEFT,
+                [
+                    BorderRotation(Face.UP, FacePosition.TOP_LEFT),
+                    BorderRotation(Face.UP, FacePosition.TOP_CENTER),
+                    BorderRotation(Face.UP, FacePosition.TOP_RIGHT),
+
+                    BorderRotation(Face.FRONT, FacePosition.TOP_LEFT),
+                    BorderRotation(Face.FRONT, FacePosition.MIDDLE_LEFT),
+                    BorderRotation(Face.FRONT, FacePosition.BOTTOM_LEFT),
+
+                    BorderRotation(Face.DOWN, FacePosition.TOP_LEFT),
+                    BorderRotation(Face.DOWN, FacePosition.MIDDLE_LEFT),
+                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_LEFT),
+
+                    BorderRotation(Face.BACK, FacePosition.TOP_LEFT),
+                    BorderRotation(Face.BACK, FacePosition.MIDDLE_LEFT),
+                    BorderRotation(Face.BACK, FacePosition.BOTTOM_LEFT),
+                ]
+            )
         elif symbol == Rotations.U:
             return RotationData(
                 Face.UP,
@@ -104,6 +140,48 @@ class Rotations:
                     BorderRotation(Face.RIGHT, FacePosition.TOP_RIGHT),
                     BorderRotation(Face.RIGHT, FacePosition.TOP_CENTER),
                     BorderRotation(Face.RIGHT, FacePosition.TOP_LEFT),
+                ]
+            )
+        elif symbol == Rotations.D:
+            return RotationData(
+                Face.DOWN,
+                [
+                    BorderRotation(Face.FRONT, FacePosition.BOTTOM_LEFT),
+                    BorderRotation(Face.FRONT, FacePosition.BOTTOM_CENTER),
+                    BorderRotation(Face.FRONT, FacePosition.BOTTOM_RIGHT),
+
+                    BorderRotation(Face.RIGHT, FacePosition.BOTTOM_LEFT),
+                    BorderRotation(Face.RIGHT, FacePosition.BOTTOM_CENTER),
+                    BorderRotation(Face.RIGHT, FacePosition.BOTTOM_RIGHT),
+
+                    BorderRotation(Face.BACK, FacePosition.TOP_RIGHT),
+                    BorderRotation(Face.BACK, FacePosition.TOP_CENTER),
+                    BorderRotation(Face.BACK, FacePosition.TOP_LEFT),
+
+                    BorderRotation(Face.LEFT, FacePosition.BOTTOM_LEFT),
+                    BorderRotation(Face.LEFT, FacePosition.BOTTOM_CENTER),
+                    BorderRotation(Face.LEFT, FacePosition.BOTTOM_RIGHT),
+                ]
+            )
+        elif symbol == Rotations.B:
+            return RotationData(
+                Face.BACK,
+                [
+                    BorderRotation(Face.UP, FacePosition.TOP_RIGHT),
+                    BorderRotation(Face.UP, FacePosition.TOP_CENTER),
+                    BorderRotation(Face.UP, FacePosition.TOP_LEFT),
+
+                    BorderRotation(Face.LEFT, FacePosition.TOP_RIGHT),
+                    BorderRotation(Face.LEFT, FacePosition.MIDDLE_RIGHT),
+                    BorderRotation(Face.LEFT, FacePosition.BOTTOM_RIGHT),
+
+                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_LEFT),
+                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_CENTER),
+                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_RIGHT),
+
+                    BorderRotation(Face.RIGHT, FacePosition.BOTTOM_RIGHT),
+                    BorderRotation(Face.RIGHT, FacePosition.MIDDLE_RIGHT),
+                    BorderRotation(Face.RIGHT, FacePosition.TOP_RIGHT),
                 ]
             )
         else:
