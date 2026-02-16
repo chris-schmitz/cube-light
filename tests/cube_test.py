@@ -229,8 +229,8 @@ class TestCube:
         assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, top_after_rotation).color == YELLOW
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, top_after_rotation).color == YELLOW
         back_after_rotation = cube.get_face_assignments(Face.BACK)
-        assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, back_after_rotation).color == ORANGE
-        assert find_assignment_data_by_face_position(FacePosition.MIDDLE_RIGHT, back_after_rotation).color == GREEN
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_LEFT, back_after_rotation).color == ORANGE
+        assert find_assignment_data_by_face_position(FacePosition.BOTTOM_CENTER, back_after_rotation).color == GREEN
         assert find_assignment_data_by_face_position(FacePosition.BOTTOM_RIGHT, back_after_rotation).color == GREEN
         bottom_after_rotation = cube.get_face_assignments(Face.DOWN)
         assert find_assignment_data_by_face_position(FacePosition.TOP_RIGHT, bottom_after_rotation).color == WHITE

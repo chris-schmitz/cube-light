@@ -152,7 +152,7 @@ def update_state(state):
     global current_state
     if current_state != state:
         current_state = state
-        print(current_state)
+        # print(current_state)
         update_pixels(current_state)
         pixels.show()
 
@@ -160,23 +160,27 @@ def update_state(state):
 get_face_colors()
 switch = False
 cube.set_rotation(Rotations.R)
+time.sleep(3)
+update_state(cube.get_state())
+rotation_count = 0
 while True:
+    # if rotation_count > 7:
+    #     # ! temp break so I can confirm colors
+    #     break
+    # rotation_count += 1
     print(f"cube is rotating: ${cube.is_rotating()}")
+    print(f"rotating face: ${cube._current_rotation_symbol}")
     if cube.is_rotating():
         state = cube.get_state()
         update_state(state)
         cube.rotate()
     else:
-        switch != switch
+        switch = not switch
         if switch:
             cube.set_rotation(Rotations.R)
         else:
             cube.set_rotation(Rotations.U)
+        time.sleep(2)
         cube.rotate()
-
-    # # if cube.is_rotating():
-    # print(f"cube is rotating: ${cube.is_rotating()}")
-    # cube.rotate()
-    # state = cube.get_state()
 
     time.sleep(0.05)
