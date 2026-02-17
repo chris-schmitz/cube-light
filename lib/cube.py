@@ -347,7 +347,9 @@ class Cube:
 
             rotation_data = Rotations.get_rotation_data(self._current_rotation_symbol)
 
-            updated_face_colors = self._rotate_face(rotation_data)
+            updated_face_colors = []
+            if self._active_rotation_count != 2:
+                updated_face_colors = self._rotate_face(rotation_data)
             updated_border_colors = self._rotate_face_border(rotation_data)
 
             self._set_updated_colors(rotation_data, updated_face_colors, updated_border_colors)
@@ -508,14 +510,15 @@ class Cube:
                             updated_face_colors: List[Tuple[int, int, int]],
                             updated_border_colors: List[Tuple[int, int, int]]
                             ):
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_LEFT, updated_face_colors[0]),
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_CENTER, updated_face_colors[1]),
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_RIGHT, updated_face_colors[2]),
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.MIDDLE_RIGHT, updated_face_colors[3]),
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_RIGHT, updated_face_colors[4]),
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_CENTER, updated_face_colors[5]),
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_LEFT, updated_face_colors[6]),
-        self._get_face(rotation_data.face).set_cell_color(FacePosition.MIDDLE_LEFT, updated_face_colors[7]),
+        if updated_face_colors != []:
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_LEFT, updated_face_colors[0]),
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_CENTER, updated_face_colors[1]),
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.TOP_RIGHT, updated_face_colors[2]),
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.MIDDLE_RIGHT, updated_face_colors[3]),
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_RIGHT, updated_face_colors[4]),
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_CENTER, updated_face_colors[5]),
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.BOTTOM_LEFT, updated_face_colors[6]),
+            self._get_face(rotation_data.face).set_cell_color(FacePosition.MIDDLE_LEFT, updated_face_colors[7]),
 
         for i, data in enumerate(rotation_data.border_rotation_data):
             self._get_face(data.face).set_cell_color(data.position, updated_border_colors[i])

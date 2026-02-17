@@ -1,5 +1,4 @@
 import time
-from typing import List, Tuple
 
 import board
 import neopixel
@@ -146,6 +145,7 @@ def get_face_colors():
     cube.set_face_color(Face.FRONT, color=front_color)
     cube.set_face_color(Face.BACK, color=back_color)
     cube.set_face_color(Face.RIGHT, color=right_color)
+    # cube.set_cell_color(Face.RIGHT, FacePosition.BOTTOM_LEFT, (255, 0, 255))
 
 
 def update_state(state):
@@ -160,11 +160,11 @@ def update_state(state):
 get_face_colors()
 switch = False
 cube.set_rotation(Rotations.R)
-time.sleep(3)
+time.sleep(3.5)
 update_state(cube.get_state())
 rotation_count = 0
 while True:
-    # if rotation_count > 7:
+    # if rotation_count > 3:
     #     # ! temp break so I can confirm colors
     #     break
     # rotation_count += 1
@@ -174,13 +174,14 @@ while True:
         state = cube.get_state()
         update_state(state)
         cube.rotate()
+
     else:
         switch = not switch
         if switch:
             cube.set_rotation(Rotations.R)
         else:
             cube.set_rotation(Rotations.U)
-        time.sleep(2)
+        time.sleep(3)
         cube.rotate()
 
     time.sleep(0.05)
