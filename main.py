@@ -1,3 +1,4 @@
+import random
 import time
 
 import board
@@ -158,30 +159,98 @@ def update_state(state):
 
 
 get_face_colors()
-switch = False
-cube.set_rotation(Rotations.R)
-time.sleep(3.5)
-update_state(cube.get_state())
+
+rotation_symbols = [
+    # Rotations.L,
+    # Rotations.L_PRIME,
+    # Rotations.R,
+    # Rotations.R_PRIME,
+    # Rotations.U,
+    # Rotations.U_PRIME,
+    # Rotations.D,
+    # Rotations.D_PRIME,
+    # Rotations.F,
+    # Rotations.F_PRIME,
+    Rotations.B,
+    Rotations.B_PRIME,
+
+    # Rotations.B,
+    # Rotations.R,
+    # Rotations.L,
+    # Rotations.U,
+    # Rotations.D,
+
+    # Rotations.R_PRIME,
+
+    # Rotations.U,
+    # Rotations.U,
+    # Rotations.R,
+    # Rotations.R,
+    # Rotations.L,
+    # Rotations.L,
+    # Rotations.U,
+    # Rotations.U,
+    # Rotations.R,
+    # Rotations.R,
+    # Rotations.L,
+    # Rotations.L,
+]
+symbol_index = 0
 rotation_count = 0
+update_state(cube.get_state())
+time.sleep(3)
+
 while True:
-    # if rotation_count > 3:
-    #     # ! temp break so I can confirm colors
-    #     break
-    # rotation_count += 1
-    print(f"cube is rotating: ${cube.is_rotating()}")
-    print(f"rotating face: ${cube._current_rotation_symbol}")
-    if cube.is_rotating():
-        state = cube.get_state()
-        update_state(state)
+    current_rotation = random.choice(rotation_symbols)
+    # current_rotation = rotation_symbols[symbol_index]
+    print(f"current rotation selection: {current_rotation}")
+    cube.set_rotation(current_rotation)
+    print(f"current index: {symbol_index}")
+    print(f"current symbol: {cube._current_rotation_symbol}")
+    print(f"total: {len(rotation_symbols)}")
+    # while rotation_count < 16:
+    while rotation_count < 4:
         cube.rotate()
+        update_state(cube.get_state())
+        time.sleep(0.1)
+        rotation_count += 1
 
-    else:
-        switch = not switch
-        if switch:
-            cube.set_rotation(Rotations.R)
-        else:
-            cube.set_rotation(Rotations.U)
-        time.sleep(3)
-        cube.rotate()
+    rotation_count = 0
+    time.sleep(1)
 
-    time.sleep(0.05)
+    # if symbol_index >= len(rotation_symbols) - 1:
+    #     symbol_index = 0
+    #     time.sleep(3)
+    #     get_face_colors()
+    #     update_state(cube.get_state())
+    # else:
+    #     symbol_index += 1
+
+# switch = False
+# cube.set_rotation(Rotations.R)
+# time.sleep(3.5)
+# update_state(cube.get_state())
+# rotation_count = 0
+#
+# while True:
+#     # if rotation_count > 3:
+#     #     # ! temp break so I can confirm colors
+#     #     break
+#     # rotation_count += 1
+#     print(f"cube is rotating: ${cube.is_rotating()}")
+#     print(f"rotating face: ${cube._current_rotation_symbol}")
+#     if cube.is_rotating():
+#         state = cube.get_state()
+#         update_state(state)
+#         cube.rotate()
+#
+#     else:
+#         switch = not switch
+#         if switch:
+#             cube.set_rotation(Rotations.R)
+#         else:
+#             cube.set_rotation(Rotations.U)
+#         time.sleep(3)
+#         cube.rotate()
+#
+#     time.sleep(0.05)
