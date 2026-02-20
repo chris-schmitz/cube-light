@@ -33,9 +33,10 @@ class BorderRotation:
 # - the bordering faces -> all cell reassignments will go from one face to the next in a specific order
 class RotationData:
     # def __init__(self, face: Face, border_order: List[Face], face_position_move_order: List[FacePosition]):
-    def __init__(self, face: Face, border_rotation_data: List[BorderRotation]):
+    def __init__(self, face: Face, border_rotation_data: List[BorderRotation], forward=True):
         self.face = face
         self.border_rotation_data = border_rotation_data
+        self.forward = forward
 
 
 class Rotations:
@@ -58,7 +59,8 @@ class Rotations:
     #    get_first(), get_second(), etc?
     @staticmethod
     def get_rotation_data(symbol: str):
-        if symbol == Rotations.R:
+        print(f"symbol when getting roation data: {symbol}")
+        if symbol == Rotations.R or symbol == Rotations.R_PRIME:
             return RotationData(
                 Face.RIGHT,
                 [
@@ -77,9 +79,10 @@ class Rotations:
                     BorderRotation(Face.DOWN, FacePosition.BOTTOM_RIGHT),
                     BorderRotation(Face.DOWN, FacePosition.MIDDLE_RIGHT),
                     BorderRotation(Face.DOWN, FacePosition.TOP_RIGHT),
-                ]
+                ],
+                symbol == Rotations.R
             )
-        elif symbol == Rotations.F:
+        elif symbol == Rotations.F or symbol == Rotations.F_PRIME:
             return RotationData(
                 Face.FRONT,
                 [
@@ -98,15 +101,16 @@ class Rotations:
                     BorderRotation(Face.LEFT, FacePosition.BOTTOM_RIGHT),
                     BorderRotation(Face.LEFT, FacePosition.MIDDLE_RIGHT),
                     BorderRotation(Face.LEFT, FacePosition.TOP_RIGHT),
-                ]
+                ],
+                symbol == Rotations.F
             )
-        elif symbol == Rotations.L:
+        elif symbol == Rotations.L or symbol == Rotations.L_PRIME:
             return RotationData(
                 Face.LEFT,
                 [
                     BorderRotation(Face.UP, FacePosition.TOP_LEFT),
-                    BorderRotation(Face.UP, FacePosition.TOP_CENTER),
-                    BorderRotation(Face.UP, FacePosition.TOP_RIGHT),
+                    BorderRotation(Face.UP, FacePosition.MIDDLE_LEFT),
+                    BorderRotation(Face.UP, FacePosition.BOTTOM_LEFT),
 
                     BorderRotation(Face.FRONT, FacePosition.TOP_LEFT),
                     BorderRotation(Face.FRONT, FacePosition.MIDDLE_LEFT),
@@ -119,9 +123,10 @@ class Rotations:
                     BorderRotation(Face.BACK, FacePosition.TOP_LEFT),
                     BorderRotation(Face.BACK, FacePosition.MIDDLE_LEFT),
                     BorderRotation(Face.BACK, FacePosition.BOTTOM_LEFT),
-                ]
+                ],
+                symbol == Rotations.L
             )
-        elif symbol == Rotations.U:
+        elif symbol == Rotations.U or symbol == Rotations.U_PRIME:
             return RotationData(
                 Face.UP,
                 [
@@ -140,9 +145,10 @@ class Rotations:
                     BorderRotation(Face.RIGHT, FacePosition.TOP_RIGHT),
                     BorderRotation(Face.RIGHT, FacePosition.TOP_CENTER),
                     BorderRotation(Face.RIGHT, FacePosition.TOP_LEFT),
-                ]
+                ],
+                symbol == Rotations.U_PRIME
             )
-        elif symbol == Rotations.D:
+        elif symbol == Rotations.D or symbol == Rotations.D_PRIME:
             return RotationData(
                 Face.DOWN,
                 [
@@ -161,9 +167,10 @@ class Rotations:
                     BorderRotation(Face.LEFT, FacePosition.BOTTOM_LEFT),
                     BorderRotation(Face.LEFT, FacePosition.BOTTOM_CENTER),
                     BorderRotation(Face.LEFT, FacePosition.BOTTOM_RIGHT),
-                ]
+                ],
+                symbol == Rotations.D
             )
-        elif symbol == Rotations.B:
+        elif symbol == Rotations.B or symbol == Rotations.B_PRIME:
             return RotationData(
                 Face.BACK,
                 [
@@ -171,18 +178,19 @@ class Rotations:
                     BorderRotation(Face.UP, FacePosition.TOP_CENTER),
                     BorderRotation(Face.UP, FacePosition.TOP_LEFT),
 
-                    BorderRotation(Face.LEFT, FacePosition.TOP_RIGHT),
-                    BorderRotation(Face.LEFT, FacePosition.MIDDLE_RIGHT),
-                    BorderRotation(Face.LEFT, FacePosition.BOTTOM_RIGHT),
+                    BorderRotation(Face.LEFT, FacePosition.TOP_LEFT),
+                    BorderRotation(Face.LEFT, FacePosition.MIDDLE_LEFT),
+                    BorderRotation(Face.LEFT, FacePosition.BOTTOM_LEFT),
 
-                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_LEFT),
-                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_CENTER),
                     BorderRotation(Face.DOWN, FacePosition.BOTTOM_RIGHT),
+                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_CENTER),
+                    BorderRotation(Face.DOWN, FacePosition.BOTTOM_LEFT),
 
                     BorderRotation(Face.RIGHT, FacePosition.BOTTOM_RIGHT),
                     BorderRotation(Face.RIGHT, FacePosition.MIDDLE_RIGHT),
                     BorderRotation(Face.RIGHT, FacePosition.TOP_RIGHT),
-                ]
+                ],
+                symbol == Rotations.B
             )
         else:
             raise UnknownRotationError(symbol)
@@ -346,6 +354,8 @@ class Cube:
             self._is_rotating = True
 
             rotation_data = Rotations.get_rotation_data(self._current_rotation_symbol)
+            print(f"current rotation symbol in setter: {self._current_rotation_symbol}")
+            print(f"got rotation data: {rotation_data.face}")
 
             updated_face_colors = []
             if self._active_rotation_count != 2:
@@ -370,8 +380,12 @@ class Cube:
             face.get_cell_color(FacePosition.BOTTOM_LEFT),
             face.get_cell_color(FacePosition.MIDDLE_LEFT),
         ]
-        color_to_shift = updated_colors.pop()
-        updated_colors.insert(0, color_to_shift)
+        if rotation_data.forward:
+            color_to_shift = updated_colors.pop()
+            updated_colors.insert(0, color_to_shift)
+        else:
+            color_to_shift = updated_colors.pop(0)
+            updated_colors.append(color_to_shift)
         return updated_colors
 
         # todo: cut
@@ -398,8 +412,16 @@ class Cube:
         for data in rotate_data.border_rotation_data:
             updated_colors.append(self._get_face(data.face).get_cell_color(data.position))
 
-        color_to_shift = updated_colors.pop()
-        updated_colors.insert(0, color_to_shift)
+        print(f"rotation data forward: {rotate_data.forward}")
+        print(f"rotation data face: {rotate_data.face}")
+        if rotate_data.forward:
+            print('rotating forward')
+            color_to_shift = updated_colors.pop()
+            updated_colors.insert(0, color_to_shift)
+        else:
+            print('rotating backward')
+            color_to_shift = updated_colors.pop(0)
+            updated_colors.append(color_to_shift)
         return updated_colors
 
         # # todo if this works we can move this loop outside of the method so we can set all of the cells at the same time

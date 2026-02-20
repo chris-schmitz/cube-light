@@ -128,6 +128,8 @@ class TestCube:
             (255, 255, 255)
         ]
 
+    # todo: come back and assert remaining rotations, also think about if it could be parameterized
+
     def test_can_rotate_border_right(self, cube):
         cube.set_face_color(Face.UP, YELLOW)
         cube.set_face_color(Face.FRONT, BLUE)
@@ -135,21 +137,6 @@ class TestCube:
         cube.set_face_color(Face.RIGHT, RED)
         cube.set_face_color(Face.BACK, GREEN)
 
-        assert get_color(Face.UP, FacePosition.TOP_RIGHT, cube) == YELLOW
-        assert get_color(Face.UP, FacePosition.MIDDLE_RIGHT, cube) == YELLOW
-        assert get_color(Face.UP, FacePosition.BOTTOM_RIGHT, cube) == YELLOW
-        assert get_color(Face.BACK, FacePosition.TOP_RIGHT, cube) == GREEN
-        assert get_color(Face.BACK, FacePosition.MIDDLE_RIGHT, cube) == GREEN
-        assert get_color(Face.BACK, FacePosition.BOTTOM_RIGHT, cube) == GREEN
-        assert get_color(Face.DOWN, FacePosition.TOP_RIGHT, cube) == WHITE
-        assert get_color(Face.DOWN, FacePosition.MIDDLE_RIGHT, cube) == WHITE
-        assert get_color(Face.DOWN, FacePosition.BOTTOM_RIGHT, cube) == WHITE
-        assert get_color(Face.FRONT, FacePosition.TOP_RIGHT, cube) == BLUE
-        assert get_color(Face.FRONT, FacePosition.MIDDLE_RIGHT, cube) == BLUE
-        assert get_color(Face.FRONT, FacePosition.BOTTOM_RIGHT, cube) == BLUE
-        assert get_color(Face.RIGHT, FacePosition.TOP_RIGHT, cube) == RED
-        assert get_color(Face.RIGHT, FacePosition.MIDDLE_RIGHT, cube) == RED
-        assert get_color(Face.RIGHT, FacePosition.BOTTOM_RIGHT, cube) == RED
         assert cube.is_rotating() == False
 
         # ^ https://jperm.net/3x3/moves
@@ -169,6 +156,38 @@ class TestCube:
         assert get_color(Face.FRONT, FacePosition.TOP_RIGHT, cube) == BLUE
         assert get_color(Face.FRONT, FacePosition.MIDDLE_RIGHT, cube) == BLUE
         assert get_color(Face.FRONT, FacePosition.BOTTOM_RIGHT, cube) == WHITE
+        assert get_color(Face.RIGHT, FacePosition.TOP_RIGHT, cube) == RED
+        assert get_color(Face.RIGHT, FacePosition.MIDDLE_RIGHT, cube) == RED
+        assert get_color(Face.RIGHT, FacePosition.BOTTOM_RIGHT, cube) == RED
+
+    def test_can_rotate_border_right_prime(self, cube):
+        cube.set_face_color(Face.UP, YELLOW)
+        cube.set_face_color(Face.FRONT, BLUE)
+        cube.set_face_color(Face.DOWN, WHITE)
+        cube.set_face_color(Face.RIGHT, RED)
+        cube.set_face_color(Face.BACK, GREEN)
+
+        assert cube.is_rotating() == False
+
+        # ^ https://jperm.net/3x3/moves
+        cube.set_rotation(Rotations.R_PRIME)
+        cube.rotate()
+
+        assert cube.is_rotating() == True
+        # * small note, but the order of assertion here is changed not b/c of the business logic but because it makes
+        # * it easier to trace the movement of the colors when looking at a physical cube
+        assert get_color(Face.UP, FacePosition.TOP_RIGHT, cube) == GREEN
+        assert get_color(Face.UP, FacePosition.MIDDLE_RIGHT, cube) == YELLOW
+        assert get_color(Face.UP, FacePosition.BOTTOM_RIGHT, cube) == YELLOW
+        assert get_color(Face.FRONT, FacePosition.TOP_RIGHT, cube) == YELLOW
+        assert get_color(Face.FRONT, FacePosition.MIDDLE_RIGHT, cube) == BLUE
+        assert get_color(Face.FRONT, FacePosition.BOTTOM_RIGHT, cube) == BLUE
+        assert get_color(Face.DOWN, FacePosition.TOP_RIGHT, cube) == BLUE
+        assert get_color(Face.DOWN, FacePosition.MIDDLE_RIGHT, cube) == WHITE
+        assert get_color(Face.DOWN, FacePosition.BOTTOM_RIGHT, cube) == WHITE
+        assert get_color(Face.BACK, FacePosition.TOP_RIGHT, cube) == WHITE
+        assert get_color(Face.BACK, FacePosition.MIDDLE_RIGHT, cube) == GREEN
+        assert get_color(Face.BACK, FacePosition.BOTTOM_RIGHT, cube) == GREEN
         assert get_color(Face.RIGHT, FacePosition.TOP_RIGHT, cube) == RED
         assert get_color(Face.RIGHT, FacePosition.MIDDLE_RIGHT, cube) == RED
         assert get_color(Face.RIGHT, FacePosition.BOTTOM_RIGHT, cube) == RED
