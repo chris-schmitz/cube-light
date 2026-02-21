@@ -161,46 +161,27 @@ def update_state(state):
 get_face_colors()
 
 rotation_symbols = [
-    # Rotations.L,
-    # Rotations.L_PRIME,
-    # Rotations.R,
-    # Rotations.R_PRIME,
-    # Rotations.U,
-    # Rotations.U_PRIME,
-    # Rotations.D,
-    # Rotations.D_PRIME,
-    # Rotations.F,
-    # Rotations.F_PRIME,
+    Rotations.L,
+    Rotations.L_PRIME,
+    Rotations.R,
+    Rotations.R_PRIME,
+    Rotations.U,
+    Rotations.U_PRIME,
+    Rotations.D,
+    Rotations.D_PRIME,
+    Rotations.F,
+    Rotations.F_PRIME,
     Rotations.B,
     Rotations.B_PRIME,
-
-    # Rotations.B,
-    # Rotations.R,
-    # Rotations.L,
-    # Rotations.U,
-    # Rotations.D,
-
-    # Rotations.R_PRIME,
-
-    # Rotations.U,
-    # Rotations.U,
-    # Rotations.R,
-    # Rotations.R,
-    # Rotations.L,
-    # Rotations.L,
-    # Rotations.U,
-    # Rotations.U,
-    # Rotations.R,
-    # Rotations.R,
-    # Rotations.L,
-    # Rotations.L,
 ]
 symbol_index = 0
 rotation_count = 0
 update_state(cube.get_state())
 time.sleep(3)
 
-while True:
+
+def random_rotations():
+    global rotation_count, rotation_symbols
     current_rotation = random.choice(rotation_symbols)
     # current_rotation = rotation_symbols[symbol_index]
     print(f"current rotation selection: {current_rotation}")
@@ -208,7 +189,6 @@ while True:
     print(f"current index: {symbol_index}")
     print(f"current symbol: {cube._current_rotation_symbol}")
     print(f"total: {len(rotation_symbols)}")
-    # while rotation_count < 16:
     while rotation_count < 4:
         cube.rotate()
         update_state(cube.get_state())
@@ -217,6 +197,53 @@ while True:
 
     rotation_count = 0
     time.sleep(1)
+
+
+plus_and_minus_rotations = [
+    Rotations.U,
+    Rotations.U,
+    Rotations.R,
+    Rotations.R,
+    Rotations.L,
+    Rotations.L,
+    Rotations.U,
+    Rotations.U,
+    Rotations.R,
+    Rotations.R,
+    Rotations.L,
+    Rotations.L,
+]
+
+plus_minus_symbol_index = 0
+
+
+def plus_and_minus():
+    global rotation_count, rotation_symbols, plus_minus_symbol_index
+    current_rotation = plus_and_minus_rotations[plus_minus_symbol_index]
+    print(f"current rotation selection: {current_rotation}")
+    cube.set_rotation(current_rotation)
+    print(f"current index: {symbol_index}")
+    print(f"current symbol: {cube._current_rotation_symbol}")
+    print(f"total: {len(rotation_symbols)}")
+    while rotation_count < 4:
+        cube.rotate()
+        update_state(cube.get_state())
+        time.sleep(0.1)
+        rotation_count += 1
+
+    rotation_count = 0
+    if plus_minus_symbol_index >= len(plus_and_minus_rotations) - 1:
+        time.sleep(15)
+        get_face_colors()
+        plus_minus_symbol_index = 0
+    else:
+        plus_minus_symbol_index += 1
+        time.sleep(1)
+
+
+while True:
+    # random_rotations()
+    plus_and_minus()
 
     # if symbol_index >= len(rotation_symbols) - 1:
     #     symbol_index = 0
